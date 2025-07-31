@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
@@ -60,7 +60,7 @@
     <div class="categories">
       <button onclick="loadCategory('ru')">RU</button>
       <button onclick="loadCategory('uz')">UZ</button>
-     <button onclick="loadCategory('sport')">Спорт</button> 
+      <button onclick="loadCategory('sport')">Спорт</button>
     </div>
     <input type="text" class="search" placeholder="Поиск..." oninput="filterChannels(this.value)">
     <ul class="channel-list" id="channelList"></ul>
@@ -75,17 +75,29 @@
   <script>
     const playlists = {
       ru: "https://iptv-org.github.io/iptv/countries/ru.m3u",
-      uz: "https://iptv-org.github.io/iptv/countries/uz.m3u",
-      sport: "https://tva.org.ua/ip/sport.m3u"
+      uz: "https://iptv-org.github.io/iptv/countries/uz.m3u"
+      // sport — удалён из плейлистов, используется только manual
     };
 
     const manualChannels = {
       ru: [
-        { name: "Test", url: "https://example.com/ru1.m3u8" }
+        { name: "Test RU", url: "https://example.com/ru1.m3u8" }
       ],
       uz: [
-        { name: "Sport", url: "https://str5.tvcom.uz/27/tracks-v2a1/mono.m3u8?token=cfceaa49eeb6a4332e89e83f485328fb" },
-        { name: "Test", url: "https://example.com/uz1.m3u8" }
+        { name: "Sport UZ", url: "https://str5.tvcom.uz/27/tracks-v2a1/mono.m3u8?token=cfceaa49eeb6a4332e89e83f485328fb" }
+      ],
+      sport: [
+        { name: "Setanta 1", url: "https://stream.setanta.com/setanta1/playlist.m3u8" },
+        { name: "Setanta 2", url: "https://stream.setanta.com/setanta2/playlist.m3u8" },
+        { name: "Setanta 3", url: "https://stream.setanta.com/setanta3/playlist.m3u8" },
+        { name: "Setanta Sports +", url: "https://stream.setanta.com/setantaplus/playlist.m3u8" },
+        { name: "Match TV", url: "https://strm.yandex.ru/kal/MatchTV/MatchTV0.m3u8" },
+        { name: "Матч Арена", url: "https://strm.yandex.ru/kal/MatchArena/MatchArena0.m3u8" },
+        { name: "Матч Игра", url: "https://strm.yandex.ru/kal/MatchIgra/MatchIgra0.m3u8" },
+        { name: "Матч Планета", url: "https://strm.yandex.ru/kal/MatchPlaneta/MatchPlaneta0.m3u8" },
+        { name: "Матч Премьер", url: "https://strm.yandex.ru/kal/MatchPremier/MatchPremier0.m3u8" },
+        { name: "Eurosport 1", url: "https://eurosport1vod-hls.akamaized.net/out/v1/bffbabd574dc4502b2f2191a86f1c7ce/index.m3u8" },
+        { name: "Eurosport 2", url: "https://eurosport2vod-hls.akamaized.net/out/v1/9620bfa52f5447b89a82f19b4430f2b7/index.m3u8" }
       ]
     };
 
@@ -101,7 +113,7 @@
         allChannels.push(...manualChannels[category]);
       }
 
-      // 2. Загружаем плейлист
+      // 2. Загружаем плейлист (если есть)
       if (playlists[category]) {
         try {
           const response = await fetch(playlists[category]);

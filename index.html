@@ -1,0 +1,188 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>Isfandiyor IPTV</title>
+  <style>
+    body {
+      margin: 0;
+      display: flex;
+      font-family: sans-serif;
+      height: 100vh;
+    }
+    .sidebar {
+      width: 300px;
+      background: #f0f0f0;
+      overflow-y: auto;
+      padding: 10px;
+      border-right: 1px solid #ccc;
+    }
+    .player {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    video {
+      width: 100%;
+      height: 100%;
+      background: black;
+    }
+    .categories button {
+      margin: 5px 5px 5px 0;
+      padding: 5px 10px;
+    }
+    .search {
+      margin: 10px 0;
+      width: 95%;
+      padding: 5px;
+    }
+    .channel-list {
+      list-style: none;
+      padding: 0;
+    }
+    .channel-list li {
+      cursor: pointer;
+      padding: 5px;
+      border-bottom: 1px solid #ccc;
+    }
+    .channel-list li:hover {
+      background: #ddd;
+    }
+    .error-message {
+      color: red;
+      text-align: center;
+      margin: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="sidebar">
+    <div class="categories">
+      <button onclick="loadCategory('ru')">RU</button>
+      <button onclick="loadCategory('uz')">UZ</button>
+      <!-- <button onclick="loadCategory('sport')">Спорт</button> -->
+    </div>
+    <input type="text" class="search" placeholder="Поиск..." oninput="filterChannels(this.value)">
+    <ul class="channel-list" id="channelList"></ul>
+  </div>
+
+  <div class="player">
+    <video id="videoPlayer" controls autoplay></video>
+    <div class="error-message" id="errorMessage"></div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+  <script>
+    const playlists = {
+      ru: "https://iptv-org.github.io/iptv/countries/ru.m3u",
+      uz: "https://iptv-org.github.io/iptv/countries/uz.m3u",
+      // sport: "https://example.com/sport-playlist.m3u"
+    };
+
+    const manualChannels = {
+      ru: [
+        { name: "Test", url: "https://example.com/ru1.m3u8" }
+      ],
+      uz: [
+        { name: "Sport", url: "https://str5.tvcom.uz/27/tracks-v2a1/mono.m3u8?token=cfceaa49eeb6a4332e89e83f485328fb" },
+        { name: "Test", url: "https://example.com/uz1.m3u8" }
+      ]
+    };
+
+    let allChannels = [];
+    let filteredChannels = [];
+    let hls = null;
+
+    async function loadCategory(category) {
+      allChannels = [];
+
+      // 1. Добавляем ручные каналы
+      if (manualChannels[category]) {
+        allChannels.push(...manualChannels[category]);
+      }
+
+      // 2. Загружаем плейлист
+      if (playlists[category]) {
+        try {
+          const response = await fetch(playlists[category]);
+          const m3uText = await response.text();
+          const parsed = parseM3U(m3uText);
+          allChannels.push(...parsed);
+        } catch (err) {
+          console.error("Ошибка загрузки плейлиста:", err);
+        }
+      }
+
+      filteredChannels = [...allChannels];
+      renderChannels(filteredChannels);
+    }
+
+    function parseM3U(m3uText) {
+      const lines = m3uText.split('\n');
+      const channels = [];
+      let name = '';
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i].trim();
+        if (line.startsWith('#EXTINF:')) {
+          name = line.split(',').pop();
+        } else if (line && !line.startsWith('#')) {
+          channels.push({ name, url: line });
+        }
+      }
+      return channels;
+    }
+
+    function renderChannels(channels) {
+      const list = document.getElementById('channelList');
+      list.innerHTML = '';
+      channels.forEach(ch => {
+        const li = document.createElement('li');
+        li.textContent = ch.name;
+        li.onclick = () => playChannel(ch.url, ch.name);
+        list.appendChild(li);
+      });
+    }
+
+    function playChannel(url, name) {
+      const video = document.getElementById('videoPlayer');
+      const errorMsg = document.getElementById('errorMessage');
+
+      errorMsg.textContent = '';
+      video.pause();
+      video.removeAttribute('src');
+      video.load();
+
+      if (hls) {
+        hls.destroy();
+        hls = null;
+      }
+
+      if (Hls.isSupported()) {
+        hls = new Hls();
+        hls.loadSource(url);
+        hls.attachMedia(video);
+        hls.on(Hls.Events.ERROR, (event, data) => {
+          if (data.fatal) {
+            errorMsg.textContent = `Канал "${name}" пока недоступен. Разработчик Isfandiyor скоро всё исправит.`;
+          }
+        });
+      } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+        video.src = url;
+        video.addEventListener('error', () => {
+          errorMsg.textContent = `Канал "${name}" пока недоступен. Разработчик Isfandiyor скоро всё исправит.`;
+        });
+      } else {
+        errorMsg.textContent = `Ваше устройство не поддерживает воспроизведение HLS.`;
+      }
+    }
+
+    function filterChannels(query) {
+      const lower = query.toLowerCase();
+      filteredChannels = allChannels.filter(ch => ch.name.toLowerCase().includes(lower));
+      renderChannels(filteredChannels);
+    }
+
+    window.onload = () => loadCategory('ru');
+  </script>
+</body>
+</html>

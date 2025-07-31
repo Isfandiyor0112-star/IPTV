@@ -1,69 +1,66 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
   <title>Isfandiyor`s IPTV</title>
   <style>
-  body {
-    margin: 0;
-    display: flex;
-    font-family: sans-serif;
-    height: 100vh;
-  }
-  .sidebar {
-    width: 300px;
-    background: #f0f0f0;
-    overflow-y: auto;
-    padding: 10px;
-    border-right: 1px solid #ccc;
-  }
-  .player {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-  }
-  video {
-    width: 100%;
-    height: 100%;
-    background: black;
-  }
-  .categories button {
-    margin: 5px 5px 5px 0;
-    padding: 5px 10px;
-  }
-  .search {
-    margin: 10px 0;
-    width: 95%;
-    padding: 5px;
-  }
-  .channel-list {
-    list-style: none;
-    padding: 0;
-  }
-  .channel-list li {
-    cursor: pointer;
-    padding: 5px;
-    border-bottom: 1px solid #ccc;
-  }
-  .channel-list li:hover {
-    background: #ddd;
-  }
-  .error-message {
-    color: red;
-    text-align: center;
-    margin: 10px;
-  }
-
-</style>
-  
+    body {
+      margin: 0;
+      display: flex;
+      font-family: sans-serif;
+      height: 100vh;
+    }
+    .sidebar {
+      width: 300px;
+      background: #f0f0f0;
+      overflow-y: auto;
+      padding: 10px;
+      border-right: 1px solid #ccc;
+    }
+    .player {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    video {
+      width: 100%;
+      height: 100%;
+      background: black;
+    }
+    .categories button {
+      margin: 5px 5px 5px 0;
+      padding: 5px 10px;
+    }
+    .search {
+      margin: 10px 0;
+      width: 95%;
+      padding: 5px;
+    }
+    .channel-list {
+      list-style: none;
+      padding: 0;
+    }
+    .channel-list li {
+      cursor: pointer;
+      padding: 5px;
+      border-bottom: 1px solid #ccc;
+    }
+    .channel-list li:hover {
+      background: #ddd;
+    }
+    .error-message {
+      color: red;
+      text-align: center;
+      margin: 10px;
+    }
+  </style>
 </head>
 <body>
   <div class="sidebar">
     <div class="categories">
       <button onclick="loadCategory('ru')">RU</button>
       <button onclick="loadCategory('uz')">UZ</button>
-    <!-- <button onclick="loadCategory('sport')">Спорт</button> -->
-
+     <!-- <button onclick="loadCategory('sport')">Спорт</button> -->
     </div>
     <input type="text" class="search" placeholder="Поиск..." oninput="filterChannels(this.value)">
     <ul class="channel-list" id="channelList"></ul>
@@ -79,18 +76,15 @@
     const playlists = {
       ru: "https://iptv-org.github.io/iptv/countries/ru.m3u",
       uz: "https://iptv-org.github.io/iptv/countries/uz.m3u",
-    // sport: "sport.m3u8"
+     // sport: "https://tva.org.ua/ip/sport.m3u" 
     };
 
-    const manualChannels = {
-      ru: [
-        { name: "TEST", url: "http://80.237.96.66:9090/stream/channelid/355332936?ticket=04F16AB001A9117153B2962DD656A6E6B712181E&profile=pass" }
-      ],
-      uz: [
-        { name: "Sport UZ", url: "https://str2.tvcom.uz/27/tracks-a1/mono.m3u8?token=4dc47f0946d4b191287e70c417b582a3" }
-      ],
+  const manualChannels = {
+  ru: [ { name: "Test", url: "https://example.com/ru1.m3u8" } ],
+  uz: [ { name: "Sport", url: "https://str5.tvcom.uz/27/tracks-v2a1/mono.m3u8?token=cfceaa49eeb6a4332e89e83f485328fb" } ],
+  
+};
 
-    };
 
     let allChannels = [];
     let filteredChannels = [];
@@ -104,7 +98,7 @@
         allChannels.push(...manualChannels[category]);
       }
 
-      // 2. Загружаем плейлист (если есть)
+      // 2. Загружаем плейлист
       if (playlists[category]) {
         try {
           const response = await fetch(playlists[category]);

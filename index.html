@@ -60,7 +60,7 @@
     <div class="categories">
       <button onclick="loadCategory('ru')">RU</button>
       <button onclick="loadCategory('uz')">UZ</button>
-     <!-- <button onclick="loadCategory('sport')">Спорт</button> -->
+     <button onclick="loadCategory('sport')">Спорт</button> 
     </div>
     <input type="text" class="search" placeholder="Поиск..." oninput="filterChannels(this.value)">
     <ul class="channel-list" id="channelList"></ul>
@@ -81,8 +81,11 @@
 
   const manualChannels = {
   ru: [ { name: "Test", url: "https://example.com/ru1.m3u8" } ],
-  uz: [ { name: "Sport", url: "https://str5.tvcom.uz/27/tracks-v2a1/mono.m3u8?token=cfceaa49eeb6a4332e89e83f485328fb" } ],
-  
+  uz: [ { name: "Sport TV", url: "https://str5.tvcom.uz/27/tracks-v2a1/mono.m3u8?token=cfceaa49eeb6a4332e89e83f485328fb" } ],
+  sport: [
+    { name: "", url: "https://stream.setanta.com/setanta1/playlist.m3u8" },
+    { name: "Setanta 2", url: "https://stream.setanta.com/setanta2/playlist.m3u8" }
+  ]
 };
 
 

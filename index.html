@@ -103,11 +103,13 @@
 
   <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
   <script>
-    const playlists = {
-      ru: "https://iptv-org.github.io/iptv/countries/ru.m3u",
-      uz: "https://iptv-org.github.io/iptv/countries/uz.m3u",
-      sport: "https://iptv-org.github.io/iptv/categories/sport.m3u"
-    };
+ const proxy = "https://iptv-proxy-m2sm.onrender.com/proxy?url=";
+
+const playlists = {
+  ru: proxy + "https://iptv-org.github.io/iptv/countries/ru.m3u",
+  uz: proxy + "https://iptv-org.github.io/iptv/countries/uz.m3u",
+  sport: proxy + "https://iptv-org.github.io/iptv/categories/sport.m3u"
+};
 
     const manualChannels = {
       ru: [
@@ -223,3 +225,4 @@
   </script>
 </body>
 </html>
+

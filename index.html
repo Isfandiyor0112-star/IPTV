@@ -18,7 +18,7 @@
     .channel-list li.active { background:#0078d7; font-weight:bold; }
     .error-message { color:#ff4d4d; text-align:center; margin:10px; font-size:14px; }
     .auth-buttons { margin-bottom:15px; }
-    .auth-buttons button { width:100%; margin-top:5px; padding:8px; border:none; border-radius:4px; cursor:pointer; background:#3a2a3a; color:#f5f5f5; }
+    .auth-buttons button { width:100%; margin-top:5px; padding:8px; border:none; border-radius:4px; cursor:pointer; background:#3a3a3a; color:#f5f5f5; }
     .auth-buttons button:hover { background:#0078d7; }
   </style>
 </head>
@@ -49,7 +49,7 @@
   <script>
     const firebaseConfig = {
       apiKey: "AIzaSyCpC7UxSbtGq3fZ7k4v4yCVDguFu4MU_nI",
-      authDomain: "https://iptv-ii.onrender.com",
+      authDomain: "iptv-ii.onrender.com", // ⚠️ именно твой Render-домен
       projectId: "iptv-8b8f9",
       storageBucket: "iptv-8b8f9.firebasestorage.app",
       messagingSenderId: "697245556188",
@@ -59,14 +59,13 @@
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
 
-function signInWithGoogle() {
-  const provider = new firebase.auth.GoogleAuthProvider();
-  auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
-    .then(() => auth.signInWithRedirect(provider));
-}
+    function signInWithGoogle() {
+      const provider = new firebase.auth.GoogleAuthProvider();
+      auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+        .then(() => auth.signInWithRedirect(provider));
+    }
 
-    
-       function signOut() {
+    function signOut() {
       auth.signOut().then(() => {
         const loginBtn = document.getElementById("loginBtn");
         const logoutBtn = document.getElementById("logoutBtn");
@@ -185,7 +184,7 @@ function signInWithGoogle() {
       renderChannels(filteredChannels);
     }
 
-       function playChannel(url, name) {
+        function playChannel(url, name) {
       const video = document.getElementById('videoPlayer');
       const errorMsg = document.getElementById('errorMessage');
       errorMsg.textContent = '';
@@ -221,4 +220,3 @@ function signInWithGoogle() {
   </script>
 </body>
 </html>
-

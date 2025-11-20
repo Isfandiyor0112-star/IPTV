@@ -59,12 +59,14 @@
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
 
-    function signInWithGoogle() {
-      const provider = new firebase.auth.GoogleAuthProvider();
-      auth.signInWithRedirect(provider);
-    }
+function signInWithGoogle() {
+  const provider = new firebase.auth.GoogleAuthProvider();
+  auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+    .then(() => auth.signInWithRedirect(provider));
+}
 
-    function signOut() {
+    
+       function signOut() {
       auth.signOut().then(() => {
         const loginBtn = document.getElementById("loginBtn");
         const logoutBtn = document.getElementById("logoutBtn");

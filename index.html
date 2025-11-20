@@ -44,65 +44,64 @@
   </div>
 
   <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyCpC7UxSbtGq3fZ7k4v4yCVDguFu4MU_nI",
-      authDomain: "iptv-8b8f9.firebaseapp.com", // ⚠️ именно твой Render-домен
-      projectId: "iptv-8b8f9",
-      storageBucket: "iptv-8b8f9.firebasestorage.app",
-      messagingSenderId: "697245556188",
-      appId: "1:697245556188:web:a4c8881c17eac1d76b4319",
-      measurementId: "G-XHEC9FD8NH"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyCpC7UxSbtGq3fZ7k4v4yCVDguFu4MU_nI",
+    authDomain: "iptv-8b8f9.firebaseapp.com", // оставляем firebaseapp.com
+    projectId: "iptv-8b8f9",
+    storageBucket: "iptv-8b8f9.appspot.com",
+    messagingSenderId: "697245556188",
+    appId: "1:697245556188:web:a4c8881c17eac1d76b4319",
+    measurementId: "G-XHEC9FD8NH"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
 
-    function signInWithGoogle() {
-      const provider = new firebase.auth.GoogleAuthProvider();
-      auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
-        .then(() => auth.signInWithRedirect(provider));
-    }
-
-    function signOut() {
-      auth.signOut().then(() => {
-        const loginBtn = document.getElementById("loginBtn");
-        const logoutBtn = document.getElementById("logoutBtn");
-        loginBtn.textContent = "Войти через Google";
-        loginBtn.disabled = false;
-        logoutBtn.style.display = "none";
-      });
-    }
-
-    // обработка результата после редиректа
-    auth.getRedirectResult()
+  function signInWithGoogle() {
+    const provider = new firebase.auth.GoogleAuthProvider();
+    auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+      .then(() => auth.signInWithPopup(provider))
       .then(result => {
-        if (result.user) {
+        const user = result.user;
+        if (user) {
           const loginBtn = document.getElementById("loginBtn");
           const logoutBtn = document.getElementById("logoutBtn");
-          loginBtn.textContent = `Привет, ${result.user.displayName}`;
+          loginBtn.textContent = `Привет, ${user.displayName}`;
           loginBtn.disabled = true;
           logoutBtn.style.display = "block";
         }
       })
       .catch(err => console.error("Ошибка входа:", err));
+  }
 
-    // отслеживание состояния авторизации
-    auth.onAuthStateChanged(user => {
+  function signOut() {
+    auth.signOut().then(() => {
       const loginBtn = document.getElementById("loginBtn");
       const logoutBtn = document.getElementById("logoutBtn");
-      if (user) {
-        loginBtn.textContent = `Привет, ${user.displayName}`;
-        loginBtn.disabled = true;
-        logoutBtn.style.display = "block";
-      } else {
-        loginBtn.textContent = "Войти через Google";
-        loginBtn.disabled = false;
-        logoutBtn.style.display = "none";
-      }
+      loginBtn.textContent = "Войти через Google";
+      loginBtn.disabled = false;
+      logoutBtn.style.display = "none";
     });
-  </script>
+  }
+
+  // отслеживание состояния авторизации
+  auth.onAuthStateChanged(user => {
+    const loginBtn = document.getElementById("loginBtn");
+    const logoutBtn = document.getElementById("logoutBtn");
+    if (user) {
+      loginBtn.textContent = `Привет, ${user.displayName}`;
+      loginBtn.disabled = true;
+      logoutBtn.style.display = "block";
+    } else {
+      loginBtn.textContent = "Войти через Google";
+      loginBtn.disabled = false;
+      logoutBtn.style.display = "none";
+    }
+  });
+</script>
+
 
   <!-- HLS.js -->
   <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
@@ -220,4 +219,5 @@
   </script>
 </body>
 </html>
+
 

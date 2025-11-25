@@ -44,77 +44,75 @@
   </div>
 
   <!-- Firebase SDK -->
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-<script>
-  const firebaseConfig = {
-    apiKey: "AIzaSyCpC7UxSbtGq3fZ7k4v4yCVDguFu4MU_nI",
-    authDomain: "iptv-8b8f9.firebaseapp.com", // оставляем firebaseapp.com
-    projectId: "iptv-8b8f9",
-    storageBucket: "iptv-8b8f9.appspot.com",
-    messagingSenderId: "697245556188",
-    appId: "1:697245556188:web:a4c8881c17eac1d76b4319",
-    measurementId: "G-XHEC9FD8NH"
-  };
-  firebase.initializeApp(firebaseConfig);
-  const auth = firebase.auth();
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyCpC7UxSbtGq3fZ7k4v4yCVDguFu4MU_nI",
+      authDomain: "iptv-8b8f9.firebaseapp.com",
+      projectId: "iptv-8b8f9",
+      storageBucket: "iptv-8b8f9.firebasestorage.app",
+      messagingSenderId: "697245556188",
+      appId: "1:697245556188:web:a4c8881c17eac1d76b4319",
+      measurementId: "G-XHEC9FD8NH"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
 
-  function signInWithGoogle() {
-    const provider = new firebase.auth.GoogleAuthProvider();
-    auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
-      .then(() => auth.signInWithPopup(provider))
-      .then(result => {
-        const user = result.user;
-        if (user) {
+    function signInWithGoogle() {
+      const provider = new firebase.auth.GoogleAuthProvider();
+      auth.signInWithPopup(provider)
+        .then(result => {
+          const user = result.user;
           const loginBtn = document.getElementById("loginBtn");
           const logoutBtn = document.getElementById("logoutBtn");
           loginBtn.textContent = `Привет, ${user.displayName}`;
           loginBtn.disabled = true;
           logoutBtn.style.display = "block";
-        }
-      })
-      .catch(err => console.error("Ошибка входа:", err));
-  }
+        })
+        .catch(err => console.error("Ошибка входа:", err));
+    }
 
-  function signOut() {
-    auth.signOut().then(() => {
+    function signOut() {
+      auth.signOut().then(() => {
+        const loginBtn = document.getElementById("loginBtn");
+        const logoutBtn = document.getElementById("logoutBtn");
+        loginBtn.textContent = "Войти через Google";
+        loginBtn.disabled = false;
+        logoutBtn.style.display = "none";
+      });
+    }
+
+    auth.onAuthStateChanged(user => {
       const loginBtn = document.getElementById("loginBtn");
       const logoutBtn = document.getElementById("logoutBtn");
-      loginBtn.textContent = "Войти через Google";
-      loginBtn.disabled = false;
-      logoutBtn.style.display = "none";
+      if (user) {
+        loginBtn.textContent = `Привет, ${user.displayName}`;
+        loginBtn.disabled = true;
+        logoutBtn.style.display = "block";
+      } else {
+        loginBtn.textContent = "Войти через Google";
+        loginBtn.disabled = false;
+        logoutBtn.style.display = "none";
+      }
     });
-  }
+    
+  </script>
 
-  // отслеживание состояния авторизации
-  auth.onAuthStateChanged(user => {
-    const loginBtn = document.getElementById("loginBtn");
-    const logoutBtn = document.getElementById("logoutBtn");
-    if (user) {
-      loginBtn.textContent = `Привет, ${user.displayName}`;
-      loginBtn.disabled = true;
-      logoutBtn.style.display = "block";
-    } else {
-      loginBtn.textContent = "Войти через Google";
-      loginBtn.disabled = false;
-      logoutBtn.style.display = "none";
-    }
-  });
-</script>
-
+  
 
   <!-- HLS.js -->
   <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
   <script>
     const playlists = {
-      ru: "https://iptv-org.github.io/iptv/countries/ru.m3u",
-      uz: "https://iptv-org.github.io/iptv/countries/uz.m3u",
-      sport: "https://iptv-org.github.io/iptv/categories/sport.m3u"
+      ru: "https://raw.githubusercontent.com/Isfandiyor0112-star/m3u8/refs/heads/main/ru.m3u",
+      uz: "https://raw.githubusercontent.com/Isfandiyor0112-star/m3u8/refs/heads/main/uz.m3u",
+      sport: "https://iptv-org.github.io/iptv/categories/sports.m3u"
     };
 
     const manualChannels = {
       ru: [{ name: "1 канал (1080p)", url: "https://example.com/ru1.m3u8" }],
-      uz: [{ name: "Sport TV", url: "https://str5.tvcom.uz/27/tracks-v2a1/mono.m3u8?token=cfceaa49eeb6a4332e89e83f485328fb" }],
+      uz: [{ name: "TEST", url: "TEST" }],
       sport: [
         { name: "Setanta 1", url: "https://stream.setanta.com/setanta1/playlist.m3u8" },
         { name: "Setanta 2", url: "https://stream.setanta.com/setanta2/playlist.m3u8" }
@@ -183,7 +181,7 @@
       renderChannels(filteredChannels);
     }
 
-        function playChannel(url, name) {
+      function playChannel(url, name) {
       const video = document.getElementById('videoPlayer');
       const errorMsg = document.getElementById('errorMessage');
       errorMsg.textContent = '';
@@ -199,13 +197,13 @@
         hls.attachMedia(video);
         hls.on(Hls.Events.ERROR, (event, data) => {
           if (data.fatal) {
-            errorMsg.textContent = `Канал "${name}" пока недоступен.`;
+            errorMsg.textContent = `Канал "${name}" пока недоступен разработчик Isfandiyor скоро всё исправит.`;
           }
         });
       } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
         video.src = url;
         video.addEventListener('error', () => {
-          errorMsg.textContent = `Канал "${name}" пока недоступен.`;
+          errorMsg.textContent = `Канал "${name}" пока недоступен разработчик Isfandiyor скоро всё исправит.`;
         });
       } else {
         errorMsg.textContent = `Ваше устройство не поддерживает HLS.`;
@@ -219,5 +217,26 @@
   </script>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 

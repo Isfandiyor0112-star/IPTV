@@ -1,17 +1,25 @@
 import fetch from "node-fetch";
 
-// сюда вставь токен, который скопировал через F12
-const TOKEN = "https://str2.tvcom.uz/27/tracks-v2a1/mono.m3u8?token=bdb64e7a073e7efde3638f447518c38c";
-const PING_URL = `https://tvcom/api/keepalive?token=${TOKEN}`;
+// список токенов
+const TOKENS = [
+  "https://str2.tvcom.uz/27/tracks-v2a1/mono.m3u8?token=bdb64e7a073e7efde3638f447518c38c",
+  "https://str2.tvcom.uz/33/index.m3u8?token=c26ad385a02e2a86876064a6c553d794"
+];
 
-async function ping() {
-  try {
-    const res = await fetch(PING_URL);
-    console.log("Ping:", res.status);
-  } catch (err) {
-    console.error("Ошибка пинга:", err.message);
+// базовый URL для пинга
+const BASE_URL = "https://tvcom/api/keepalive?token=";
+
+async function pingAll() {
+  for (const token of TOKENS) {
+    const url = `${BASE_URL}${token}`;
+    try {
+      const res = await fetch(url);
+      console.log(`Ping ${token}:`, res.status);
+    } catch (err) {
+      console.error(`Ошибка пинга ${token}:`, err.message);
+    }
   }
 }
 
-// каждые 10 секунд
-setInterval(ping, 10000);
+// каждые 10 секунд пингуем все токены
+setInterval(pingAll, 10000);

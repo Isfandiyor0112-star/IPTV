@@ -2,9 +2,8 @@ import fetch from "node-fetch";
 
 // список токенов
 const TOKENS = [
-  "https://str5.tvcom.uz/27/index.m3u8?token=4e4a6baa3b358812bbc1072aeb92ddb1",
-  "https://str2.tvcom.uz/33/index.m3u8?token=e85ffd9ac9c44649eb995943c11609f2",
-  "https://str5.tvcom.uz/27/tracks-v2a1/mono.m3u8?token=6ac7cb29c89e74b7de7aa7acd1b0c6c8"
+  "https://st.uzlive.ru/setanta-1/tracks-v1a1/mono.ts.m3u8"
+ 
 ];
 
 // базовый URL для пинга

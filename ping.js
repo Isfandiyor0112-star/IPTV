@@ -1,25 +1,14 @@
 import fetch from "node-fetch";
 
-// список токенов
-const TOKENS = [
-  "https://st.uzlive.ru/setanta-1/tracks-v1a1/mono.ts.m3u8"
- 
-];
+const URL = "https://st.uzlive.ru/setanta-1/tracks-v1a1/mono.ts.m3u8";
 
-// базовый URL для пинга
-const BASE_URL = "https://tvcom/api/keepalive?token=";
-
-async function pingAll() {
-  for (const token of TOKENS) {
-    const url = `${BASE_URL}${token}`;
-    try {
-      const res = await fetch(url);
-      console.log(`Ping ${token}:`, res.status);
-    } catch (err) {
-      console.error(`Ошибка пинга ${token}:`, err.message);
-    }
+async function ping() {
+  try {
+    const res = await fetch(URL);
+    console.log("Ping:", res.status);
+  } catch (err) {
+    console.error("Ошибка:", err.message);
   }
 }
 
-// каждые 10 секунд пингуем все токены
-setInterval(pingAll, 10000);
+setInterval(ping, 5000); // каждые 10 секунд

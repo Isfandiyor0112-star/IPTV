@@ -2,7 +2,7 @@ import fetch from "node-fetch";
 
 // список токенов
 const TOKENS = [
-  "https://str2.tvcom.uz/33/index.m3u8?token=9434ef3586d692e38f8f46e6a7933151"
+  "https://vod.splay.uz/live_splay/original/Setanta2HD/tracks-v1a1/mono.m3u8"
 ];
 
 // базовый URL для пинга
@@ -21,4 +21,4 @@ async function pingAll() {
 }
 
 // каждые 10 секунд пингуем все токены
-setInterval(pingAll, 10000);
+setInterval(pingAll, 5000);

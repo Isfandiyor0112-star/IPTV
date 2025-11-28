@@ -2,7 +2,7 @@ import fetch from "node-fetch";
 
 // список токенов
 const TOKENS = [
-  "https://st.uzlive.ru/futboltvuz/tracks-a1/mono.ts.m3u8",
+  "https://st.uzlive.ru/futboltvuz/tracks-v1a1/mono.ts.m3u8",
   "https://st.uzlive.ru/sportuztv/tracks-v1a1/mono.ts.m3u8"
  
 ];

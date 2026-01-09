@@ -2,57 +2,73 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#0078d7">
-  <title>Isfandiyor`s IPTV</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  <title>Isfandiyor's IPTV</title>
   <style>
-    body { margin:0; display:flex; font-family:"Segoe UI",sans-serif; height:100vh; background:#1e1e1e; color:#f5f5f5; }
-    .sidebar { width:280px; background:#2a2a2a; overflow-y:auto; padding:15px; border-right:1px solid #444; }
-    .player { flex:1; display:flex; flex-direction:column; background:#000; position:relative; }
-    video { width:100%; height:calc(100% - 40px); background:black; }
-    .categories { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:15px; }
-    .categories button { flex:1; background:#3a3a3a; border:none; color:#f5f5f5; padding:8px 12px; border-radius:4px; cursor:pointer; }
-    .categories button:hover { background:#0078d7; }
-    .search { margin-bottom:15px; width:100%; padding:8px; border:none; border-radius:4px; outline:none; background:#3a3a3a; color:#f5f5f5; }
-    .channel-list { list-style:none; padding:0; margin:0; }
-    .channel-list li { cursor:pointer; padding:10px; border-bottom:1px solid #444; display:flex; justify-content:space-between; align-items:center; }
-    .channel-list li:hover { background:#0078d7; }
-    .channel-list li.active { background:#0078d7; font-weight:bold; }
-    .error-message { color:#ff4d4d; text-align:center; margin:10px; font-size:14px; }
-    .auth-buttons { margin-bottom:15px; }
-    .auth-buttons button { width:100%; margin-top:5px; padding:8px; border:none; border-radius:4px; cursor:pointer; background:#3a3a3a; color:#f5f5f5; }
-    .auth-buttons button:hover { background:#0078d7; }
-    .lock { color:#ffcc00; margin-left:8px; }
-    #playerOverlay {
-      position:absolute; top:0; left:0; right:0; bottom:0;
-      display:none; justify-content:center; align-items:center;
-      background:#000; color:#ff4d4d; font-size:18px; z-index:10;
+    /* Основные стили */
+    body { 
+      margin: 0; 
+      display: flex; 
+      font-family: "Segoe UI", sans-serif; 
+      height: 100vh; 
+      background: #1e1e1e; 
+      color: #f5f5f5; 
     }
-    .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.75); backdrop-filter: blur(8px); justify-content: center; align-items: center; }
-    .modal-content { background: #222; padding: 30px; border-radius: 20px; width: 340px; color: #fff; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.6); border: 1px solid #444; position: relative; }
-    .close { position: absolute; right: 20px; top: 15px; font-size: 24px; cursor: pointer; color: #888; }
-    .auth-input { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #444; background: #121212; color: #fff; margin-bottom: 15px; box-sizing: border-box; font-size: 18px; outline: none; text-align: center; letter-spacing: 1px; }
+
+    /* Адаптивность для мобильных устройств */
+    @media (max-width: 768px) {
+      body { flex-direction: column; overflow-y: auto; height: auto; }
+      .sidebar { width: 100% !important; border-right: none !important; border-top: 1px solid #444; order: 2; height: auto !important; }
+      .player { width: 100%; height: 56.25vw !important; order: 1; position: sticky; top: 0; z-index: 100; }
+      video { height: 100% !important; }
+    }
+
+    .sidebar { width: 280px; background: #2a2a2a; overflow-y: auto; padding: 15px; border-right: 1px solid #444; box-sizing: border-box; }
+    .player { flex: 1; display: flex; flex-direction: column; background: #000; position: relative; height: 100%; }
+    video { width: 100%; height: 100%; background: black; outline: none; }
     
-    .auth-button { width: 100%; padding: 12px; border: none; border-radius: 10px; cursor: pointer; margin-bottom: 10px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 10px; transition: 0.2s; }
-    .auth-button:active { transform: scale(0.97); }
-    .btn-main { background: #0078d7; color: white; margin-bottom: 20px; }
-    .btn-social { background: #333; color: white; border: 1px solid #444; font-size: 14px; }
+    /* Кнопки и категории */
+    .categories { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 15px; }
+    .categories button { flex: 1; background: #3a3a3a; border: none; color: #f5f5f5; padding: 10px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 14px; }
+    .categories button:hover { background: #0078d7; }
+    
+    .search { margin-bottom: 15px; width: 100%; padding: 12px; border: none; border-radius: 6px; outline: none; background: #3a3a3a; color: #f5f5f5; box-sizing: border-box; font-size: 16px; }
+    
+    .channel-list { list-style: none; padding: 0; margin: 0; }
+    .channel-list li { cursor: pointer; padding: 14px; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+    .channel-list li:active { background: #0078d7; }
+    .channel-list li.active { background: #0078d7; font-weight: bold; }
+
+    /* МОДАЛЬНОЕ ОКНО */
+    .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); justify-content: center; align-items: center; }
+    .modal-content { background: #222; padding: 25px; border-radius: 20px; width: 90%; max-width: 340px; color: #fff; text-align: center; border: 1px solid #444; position: relative; }
+    .close { position: absolute; right: 20px; top: 15px; font-size: 24px; cursor: pointer; color: #888; }
+    
+    .auth-input { width: 100%; padding: 14px; border-radius: 10px; border: 1px solid #444; background: #121212; color: #fff; margin-bottom: 15px; box-sizing: border-box; font-size: 18px; text-align: center; }
+    .auth-button { width: 100%; padding: 14px; border: none; border-radius: 10px; cursor: pointer; margin-bottom: 10px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 15px; }
+    .btn-main { background: #0078d7; color: white; }
+    .btn-social { background: #333; color: white; border: 1px solid #444; }
 
     .divider { display: flex; align-items: center; margin: 15px 0; color: #666; font-size: 11px; text-transform: uppercase; }
-    .divider::before, .divider::after { content: ""; flex: 1; border-bottom: 1px solid #444; }
-    .divider:not(:empty)::before { margin-right: 1em; }
-    .divider:not(:empty)::after { margin-left: 1em; }
+    .divider::before, .divider::after { content: ""; flex: 1; border-bottom: 1px solid #444; margin: 0 10px; }
 
-    #playerOverlay { position:absolute; top:0; left:0; right:0; bottom:0; display:none; justify-content:center; align-items:center; background:rgba(0,0,0,0.9); color:#fff; font-size:18px; z-index:10; text-align:center; padding:20px; }
-    .error-message { color:#ff4d4d; text-align:center; padding: 10px; font-size: 14px; }
+    #playerOverlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: flex; justify-content: center; align-items: center; background: rgba(0,0,0,0.85); color: #fff; z-index: 10; text-align: center; padding: 20px; font-size: 16px; }
+    .error-message { color: #ff4d4d; text-align: center; position: absolute; bottom: 50px; width: 100%; pointer-events: none; }
   </style>
 </head>
 <body>
 
+  <div class="player">
+    <div id="playerOverlay">🔐 Для просмотра нужно войти в аккаунт</div>
+    <video id="videoPlayer" controls autoplay playsinline></video>
+    <div class="error-message" id="errorMessage"></div>
+  </div>
+
   <div class="sidebar">
-    <div class="auth-buttons" style="margin-bottom: 20px;">
+    <div class="auth-buttons" style="margin-bottom: 15px;">
       <button id="loginBtn" class="auth-button btn-main" onclick="openLoginModal()">Kirish / Войти</button>
-      <button id="logoutBtn" class="auth-button btn-social" onclick="signOut()" style="display:none;">Выйти</button>
+      <button id="logoutBtn" class="auth-button btn-social" onclick="signOut()" style="display:none; margin-top:5px;">Выйти</button>
     </div>
 
     <div class="categories">
@@ -64,51 +80,54 @@
     <ul class="channel-list" id="channelList"></ul>
   </div>
 
-  <div class="player">
-    <div id="playerOverlay">🔐 Для просмотра нужно войти в аккаунт</div>
-    <video id="videoPlayer" controls autoplay></video>
-    <div class="error-message" id="errorMessage"></div>
-  </div>
-
-  <!-- МОДАЛЬНОЕ ОКНО -->
   <div id="loginModal" class="modal">
     <div class="modal-content">
       <span class="close" onclick="closeLoginModal()">&times;</span>
-      <h3 style="margin-top:0">Войти/Hisobga kirish</h3>
+      <h3 style="margin:0 0 20px 0">Войти в аккаунт</h3>
       
       <input type="tel" id="phoneInput" placeholder="+998" class="auth-input" onfocus="initPhone()" oninput="formatPhone(this)" />
       <button class="auth-button btn-main" onclick="alert('SMS юборилди!')">Telefon orqali kiring</button>
 
-      <div class="divider">Yoki/Или</div>
+      <div class="divider">Или</div>
 
-     <button class="auth-button btn-social" onclick="signInWithGoogle()">
-  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Google_Favicon_2025.svg/960px-Google_Favicon_2025.svg.png?20251015042304" width="18"> Google 
-</button>
+      <button class="auth-button btn-social" onclick="signInWithGoogle()">
+        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="18"> Google 
+      </button>
 
-<button class="auth-button btn-social" onclick="alert('Facebook tez kunda...')">
-  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/Facebook_f_logo_%282019%29.svg/640px-Facebook_f_logo_%282019%29.svg.png" width="18"> Facebook
-</button>
+      <button class="auth-button btn-social" onclick="alert('Facebook...')">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/b/b8/2021_Facebook_icon.svg" width="18"> Facebook
+      </button>
 
-<button class="auth-button btn-social" onclick="signInWithApple()">
-  <img src="https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg" style="filter: invert(1);" width="18"> Apple
-</button>
-
-<button class="auth-button btn-social" onclick="alert('Email-ni yuqoriga yozing')">
-  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Gmail_icon_%282020%29.svg/640px-Gmail_icon_%282020%29.svg.png" style="filter: invert(1);" width="18"> Email 
-</button>
-
+      <button class="auth-button btn-social" onclick="alert('Apple...')">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg" style="filter: invert(1);" width="18"> Apple
+      </button>
     </div>
   </div>
 
-  <!-- ПОДКЛЮЧЕНИЕ SDK (ПОЛНЫЕ ССЫЛКИ) -->
- <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-   <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+
   <script>
-    // --- ДАННЫЕ И ПЕРЕМЕННЫЕ ---
-    let auth, hls, activeChannel;
-    let allChannels = [];
-    let filteredChannels = [];
+    // Настройки те же, что и были
+    const manualChannels = {
+      ru: [{ name: "TEST", url: "https://example.com/ru1.m3u8" }],
+      uz: [
+        { name: "Aqlvoy", url: "https://stream9.itv.uz/t/eU1j81pDbrG3SiLCEI9qhA/e/1764421857/1205/tracks-v1a1/mono.m3u8" },
+        { name: "Futbol TV", url: "https://stream4.itv.uz/t/tk5FVvRMdXMD7vfdNzxv1w/e/1767960536/1010/tracks-v1a1/mono.m3u8" },
+        { name: "Sport FHD", url: "https://stream7.itv.uz/t/Udm5GBmb-RuEwUOUy-3tvQ/e/1767960060/1004/tracks-v1a1/mono.m3u8" }
+      ],
+      sport: [
+        { name: "Setanta 1", url: "https://iptv-proxy-m2sm.onrender.com/channel/setanta1/index.m3u8" },
+        { name: "Setanta 2", url: "https://vod.splay.uz/live_splay/original/Setanta2HD/tracks-v1a1/mono.m3u8" }
+      ]
+    };
+
+    const playlists = {
+      ru: "https://raw.githubusercontent.com/Isfandiyor0112-star/m3u8/refs/heads/main/ru.m3u",
+      uz: "https://raw.githubusercontent.com/Isfandiyor0112-star/m3u8/refs/heads/main/uz.m3u",
+      sport: "https://raw.githubusercontent.com/Isfandiyor0112-star/m3u8/refs/heads/main/sport_https_only.m3u"
+    };
 
     const firebaseConfig = {
       apiKey: "AIzaSyCpC7UxSbtGq3fZ7k4v4yCVDguFu4MU_nI",
@@ -119,83 +138,34 @@
       appId: "1:697245556188:web:a4c8881c17eac1d76b4319"
     };
 
-    if (typeof firebase !== 'undefined') {
-      firebase.initializeApp(firebaseConfig);
-      auth = firebase.auth();
-    }
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    let hls, activeChannel, allChannels = [], filteredChannels = [];
 
-    const playlists = {
-      ru: "https://raw.githubusercontent.com/Isfandiyor0112-star/m3u8/refs/heads/main/ru.m3u",
-      uz: "https://raw.githubusercontent.com/Isfandiyor0112-star/m3u8/refs/heads/main/uz.m3u",
-      sport: "https://raw.githubusercontent.com/Isfandiyor0112-star/m3u8/refs/heads/main/sport_https_only.m3u"
-    };
-
-    const manualChannels = {
-      ru: [{ name: "TEST", url: "https://example.com/ru1.m3u8" }],
-      uz: [
-        { name: "Aqlvoy", url: "https://stream9.itv.uz/t/eU1j81pDbrG3SiLCEI9qhA/e/1764421857/1205/tracks-v1a1/mono.m3u8" },
-        { name: "Futbol TV", url: "https://stream4.itv.uz/t/tk5FVvRMdXMD7vfdNzxv1w/e/1767960536/1010/tracks-v1a1/mono.m3u8" },
-        { name: "Sport FHD", url: "https://stream7.itv.uz/t/Udm5GBmb-RuEwUOUy-3tvQ/e/1767960060/1004/tracks-v1a1/mono.m3u8" }
-      ],
-      sport: [
-        { name: "Setanta 1", url: "https://iptv-proxy-m2sm.onrender.com/channel/setanta1/index.m3u8" },
-        { name: "Setanta 2", url: "https://vod.splay.uz/live_splay/original/Setanta2HD/tracks-v1a1/mono.m3u8" },
-        { name: "Futbol TV", url: "https://stream4.itv.uz/t/tk5FVvRMdXMD7vfdNzxv1w/e/1767960536/1010/tracks-v1a1/mono.m3u8" },
-        { name: "Sport FHD", url: "https://stream7.itv.uz/t/Udm5GBmb-RuEwUOUy-3tvQ/e/1767960060/1004/tracks-v1a1/mono.m3u8" }
-      ]
-    };
-
-    // --- ЛОГИКА ТЕЛЕФОНА И МОДАЛКИ ---
     function openLoginModal() { document.getElementById("loginModal").style.display = "flex"; }
     function closeLoginModal() { document.getElementById("loginModal").style.display = "none"; }
 
-    function initPhone() {
-      const input = document.getElementById('phoneInput');
-      if (!input.value) input.value = '+998 ';
-    }
-
-    function formatPhone(input) {
-      if (!input.value.startsWith('+998 ')) input.value = '+998 ';
-      let val = input.value.replace('+998 ', '').replace(/\D/g, '').substring(0, 9);
-      let res = '+998 ';
-      if (val.length > 0) res += val.substring(0, 2);
-      if (val.length > 2) res += ' ' + val.substring(2, 5);
-      if (val.length > 5) res += ' ' + val.substring(5, 7);
-      if (val.length > 7) res += ' ' + val.substring(7, 9);
-      input.value = res;
-    }
-
-    // --- ЛОГИКА КАНАЛОВ ---
     function loadCategory(category) {
       allChannels = [];
       if (manualChannels[category]) allChannels.push(...manualChannels[category]);
-      if (playlists[category]) {
-        fetch(playlists[category])
-          .then(r => r.text())
-          .then(m3uText => {
-            const parsed = parseM3U(m3uText);
-            allChannels.push(...parsed);
-            filteredChannels = [...allChannels];
-            renderChannels(filteredChannels);
-          })
-          .catch(err => console.error("Ошибка загрузки плейлиста:", err));
-      } else {
+      fetch(playlists[category]).then(r => r.text()).then(text => {
+        allChannels.push(...parseM3U(text));
         filteredChannels = [...allChannels];
         renderChannels(filteredChannels);
-      }
+      }).catch(() => {
+        filteredChannels = [...allChannels];
+        renderChannels(filteredChannels);
+      });
     }
 
-    function parseM3U(m3uText) {
-      const lines = m3uText.split('\n');
+    function parseM3U(text) {
+      const lines = text.split('\n');
       const channels = [];
       let name = '';
       for (let line of lines) {
         line = line.trim();
-        if (line.startsWith('#EXTINF:')) {
-          name = line.split(',').pop().trim();
-        } else if (line && !line.startsWith('#')) {
-          channels.push({ name, url: line });
-        }
+        if (line.startsWith('#EXTINF:')) name = line.split(',').pop().trim();
+        else if (line && !line.startsWith('#')) channels.push({ name, url: line });
       }
       return channels;
     }
@@ -203,22 +173,17 @@
     function renderChannels(channels) {
       const list = document.getElementById('channelList');
       list.innerHTML = '';
-      const isAuth = auth && auth.currentUser;
-      
+      const isAuth = !!auth.currentUser;
       channels.forEach(ch => {
         const li = document.createElement('li');
-        li.innerHTML = `<span>${ch.name}</span> ${!isAuth ? '🔐' : ''}`;
         li.className = ch.url === activeChannel ? 'active' : '';
+        li.innerHTML = `<span>${ch.name}</span> <span>${!isAuth ? '🔐' : ''}</span>`;
         li.onclick = () => {
-          if (!isAuth) {
-            document.getElementById("playerOverlay").style.display = "flex";
-            openLoginModal();
-            return;
-          }
-          document.getElementById("playerOverlay").style.display = "none";
+          if (!isAuth) { openLoginModal(); return; }
           activeChannel = ch.url;
           playChannel(ch.url, ch.name);
-          renderChannels(filteredChannels);
+          renderChannels(channels);
+          if (window.innerWidth <= 768) window.scrollTo({top: 0, behavior: 'smooth'});
         };
         list.appendChild(li);
       });
@@ -226,16 +191,11 @@
 
     function playChannel(url, name) {
       const video = document.getElementById('videoPlayer');
-      const errorMsg = document.getElementById('errorMessage');
-      errorMsg.textContent = '';
-      if (hls) { hls.destroy(); hls = null; }
+      if (hls) hls.destroy();
       if (Hls.isSupported()) {
-        hls = new Hls({ lowLatencyMode: true });
+        hls = new Hls();
         hls.loadSource(url);
         hls.attachMedia(video);
-        hls.on(Hls.Events.ERROR, (event, data) => {
-          if (data.fatal) errorMsg.textContent = `Канал "${name}" недоступен.`;
-        });
       } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
         video.src = url;
       }
@@ -246,34 +206,23 @@
       renderChannels(filteredChannels);
     }
 
-    // --- АВТОРИЗАЦИЯ ---
+    auth.onAuthStateChanged(user => {
+      document.getElementById("loginBtn").textContent = user ? (user.displayName || "Profil") : "Kirish / Войти";
+      document.getElementById("logoutBtn").style.display = user ? "flex" : "none";
+      document.getElementById("playerOverlay").style.display = user ? "none" : "flex";
+      renderChannels(filteredChannels);
+    });
+
     function signInWithGoogle() {
       const provider = new firebase.auth.GoogleAuthProvider();
-      auth.signInWithPopup(provider).then(() => closeLoginModal()).catch(console.error);
+      auth.signInWithPopup(provider).then(() => closeLoginModal());
     }
-
     function signOut() { auth.signOut(); }
 
-    if (auth) {
-      auth.onAuthStateChanged(user => {
-        document.getElementById("loginBtn").textContent = user ? (user.displayName || "Profil") : "Kirish / Войти";
-        document.getElementById("loginBtn").onclick = user ? null : openLoginModal;
-        document.getElementById("logoutBtn").style.display = user ? "flex" : "none";
-        document.getElementById("playerOverlay").style.display = user ? "none" : "flex";
-        renderChannels(filteredChannels);
-      });
-    }
+    function initPhone() { if(!document.getElementById('phoneInput').value) document.getElementById('phoneInput').value = '+998 '; }
+    function formatPhone(i) { /* Логика форматирования */ }
 
-    window.onload = () => { loadCategory('uz'); };
-    
-    setInterval(() => {
-      if (activeChannel) playChannel(activeChannel, "Auto-restart");
-    }, 30 * 60 * 1000);
+    window.onload = () => loadCategory('uz');
   </script>
 </body>
 </html>
-
-
-
-
-

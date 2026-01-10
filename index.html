@@ -153,47 +153,43 @@
     function openLoginModal() { document.getElementById("loginModal").style.display = "flex"; }
     function closeLoginModal() { document.getElementById("loginModal").style.display = "none"; }
 
-        function loadCategory(category) {
-      const list = document.getElementById('channelList');
-      // Очищаем список и показываем статус загрузки
-      list.innerHTML = '<li style="justify-content:center;">Загрузка списка...</li>';
       
-      // 1. Сначала берем ручные каналы (прокси)
+    function loadCategory(category) {
+      const list = document.getElementById('channelList');
+      list.innerHTML = '<li style="justify-content:center; padding:20px;">Загрузка каналов...</li>';
+      
+      // 1. Берем ручные каналы
       let localChannels = manualChannels[category] ? [...manualChannels[category]] : [];
       
-      // 2. Сразу записываем их в основной список, чтобы они не пропали
-      allChannels = localChannels;
-      filteredChannels = [...allChannels];
-      renderChannels(filteredChannels);
-
-      // 3. Загружаем дополнительные каналы из GitHub
-      fetch(playlists[category])
+      // 2. Загружаем из GitHub
+      fetch(playlists[category] + '?t=' + Date.now()) // Добавили ?t= чтобы не было кэша
         .then(r => r.text())
         .then(text => {
           const remoteChannels = parseM3U(text);
           
-          // 4. ОБЪЕДИНЯЕМ БЕЗ ПОТЕРЬ: твои прокси + каналы из M3U
-          allChannels = [...localChannels, ...remoteChannels];
+          // Объединяем
+          let combined = [...localChannels, ...remoteChannels];
           
-          // Убираем дубликаты по URL (на всякий случай)
-          const uniqueChannels = [];
-          const map = new Map();
-          for (const item of allChannels) {
-              if(!map.has(item.url)){
-                  map.set(item.url, true);
-                  uniqueChannels.push(item);
-              }
-          }
-          
-          allChannels = uniqueChannels;
+          // Убираем дубликаты по URL и чистим имена
+          const uniqueMap = new Map();
+          combined.forEach(ch => {
+            const cleanName = ch.name.replace(/[\r\n]+/g, "").trim();
+            if(!uniqueMap.has(ch.url)) {
+              uniqueMap.set(ch.url, { name: cleanName, url: ch.url });
+            }
+          });
+
+          // Превращаем обратно в массив и СОРТИРУЕМ по алфавиту
+          allChannels = Array.from(uniqueMap.values()).sort((a, b) => 
+            a.name.localeCompare(b.name)
+          );
+
           filteredChannels = [...allChannels];
-          
-          // 5. Перерисовываем полный список
           renderChannels(filteredChannels);
         })
         .catch(err => {
-          console.error("Ошибка GitHub:", err);
-          // Если интернет-список упал, оставляем хотя бы ручные каналы
+          console.error("Ошибка:", err);
+          allChannels = localChannels;
           renderChannels(allChannels);
         });
     }
@@ -206,14 +202,15 @@
       for (let i = 0; i < lines.length; i++) {
         let line = lines[i].trim();
         if (line.startsWith('#EXTINF:')) {
-          // Вытаскиваем название канала после запятой
+          // Ищем название после последней запятой
           const parts = line.split(',');
-          currentName = parts[parts.length - 1].trim();
-        } else if (line && !line.startsWith('#')) {
-          // Это ссылка
+          if (parts.length > 1) {
+            currentName = parts[parts.length - 1].trim();
+          }
+        } else if (line && line.startsWith('http')) {
           if (currentName) {
             channels.push({ name: currentName, url: line });
-            currentName = ''; // Сбрасываем для следующего
+            currentName = '';
           }
         }
       }
@@ -280,4 +277,5 @@
   </script>
 </body>
 </html>
+
 

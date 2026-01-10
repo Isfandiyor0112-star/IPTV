@@ -8,28 +8,39 @@
   <meta name="theme-color" content="#0078d7">
   <title>Isfandiyor's IPTV</title>
   <style>
+    /* ОБЩИЕ НАСТРОЙКИ */
     body { margin:0; display:flex; font-family:"Segoe UI", sans-serif; height:100vh; background:#1e1e1e; color:#f5f5f5; overflow: hidden; }
     
-    /* Адаптивность */
+    /* АДАПТИВНОСТЬ: МОБИЛЬНАЯ ВЕРСИЯ */
     @media (max-width: 768px) {
-      body { flex-direction: column; overflow-y: auto; height: auto; }
-      .sidebar { width: 100% !important; order: 2; border-right: none !important; }
-      .player { width: 100%; height: 56.25vw !important; order: 1; position: sticky; top: 0; z-index: 100; }
+      body { flex-direction: column; }
+      .player { width: 100%; height: 56.25vw !important; flex-shrink: 0; position: sticky; top: 0; z-index: 100; order: 1; background: #000; }
+      .sidebar { width: 100% !important; flex-grow: 1; border-right: none !important; height: calc(100vh - 56.25vw); order: 2; display: flex; flex-direction: column; overflow: hidden; }
     }
 
-    .sidebar { width:280px; background:#2a2a2a; overflow-y:auto; padding:15px; border-right:1px solid #444; flex-shrink: 0; }
-    .player { flex:1; display:flex; flex-direction:column; background:#000; position:relative; }
-    video { width:100%; height:100%; background:black; }
+    /* ПК ВЕРСИЯ (ИСПРАВЛЕНО) */
+    @media (min-width: 769px) {
+      .sidebar { width: 320px; height: 100vh; border-right: 1px solid #444; display: flex; flex-direction: column; flex-shrink: 0; order: 1; }
+      .player { flex: 1; height: 100vh; position: relative; background: #000; display: flex; flex-direction: column; order: 2; overflow: hidden; }
+    }
+
+    .sidebar { background:#2a2a2a; padding: 15px; box-sizing: border-box; }
+    
+    /* ПЛЕЕР (ИСПРАВЛЕНО ДЛЯ ПК) */
+    .video-container { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: #000; position: relative; }
+    video { width: 100%; height: 100%; max-height: 100vh; object-fit: contain; background:black; z-index: 1; }
+    
+    /* Прокрутка списка */
+    .sidebar-content { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; touch-action: pan-y; margin-top: 10px; }
     
     .categories { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:15px; }
-    .categories button { flex:1; background:#3a3a3a; border:none; color:#f5f5f5; padding:10px; border-radius:6px; cursor:pointer; font-weight: bold; }
+    .categories button { flex:1; background:#3a3a3a; border:none; color:#f5f5f5; padding:10px; border-radius:6px; cursor:pointer; font-weight: bold; font-size: 13px; }
     .categories button:hover { background:#0078d7; }
     
-    .search { margin-bottom:15px; width:100%; padding:12px; border:none; border-radius:6px; outline:none; background:#3a3a3a; color:#f5f5f5; box-sizing: border-box; }
+    .search { width:100%; padding:12px; border:none; border-radius:6px; outline:none; background:#3a3a3a; color:#f5f5f5; box-sizing: border-box; margin-bottom: 10px; }
     
     .channel-list { list-style:none; padding:0; margin:0; }
-    .channel-list li { cursor:pointer; padding:12px; border-bottom:1px solid #333; display:flex; justify-content:space-between; align-items:center; transition: 0.2s; }
-    .channel-list li:hover { background:#333; }
+    .channel-list li { cursor:pointer; padding:12px; border-bottom:1px solid #333; display:flex; justify-content:space-between; align-items:center; transition: 0.2s; font-size: 14px; }
     .channel-list li.active { background:#0078d7; font-weight:bold; }
 
     /* МОДАЛЬНОЕ ОКНО */
@@ -38,7 +49,6 @@
     .close { position: absolute; right: 20px; top: 15px; font-size: 24px; cursor: pointer; color: #888; }
     
     .auth-button { width: 100%; padding: 14px; border: none; border-radius: 12px; cursor: pointer; margin-bottom: 10px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 15px; transition: 0.2s; }
-    .auth-button:active { transform: scale(0.96); }
     .btn-main { background: #0078d7; color: white; }
     .btn-social { background: #333; color: white; border: 1px solid #444; }
 
@@ -46,10 +56,22 @@
     .divider::before, .divider::after { content: ""; flex: 1; border-bottom: 1px solid #444; margin: 0 10px; }
 
     #playerOverlay { position:absolute; top:0; left:0; right:0; bottom:0; display:flex; justify-content:center; align-items:center; background:rgba(0,0,0,0.85); color:#fff; z-index:10; text-align:center; padding:20px; font-size:18px; }
-    .error-message { color:#ff4d4d; text-align:center; padding: 10px; font-size: 14px; background: rgba(0,0,0,0.7); position: absolute; bottom: 0; width: 100%; }
+    .error-message { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); color: #ff4d4d; display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 999; text-align: center; padding: 20px; box-sizing: border-box; }
   </style>
 </head>
 <body>
+
+  <div class="player">
+    <div id="playerOverlay">🔐 Для просмотра нужно войти в аккаунт</div>
+    <div class="video-container">
+      <video id="videoPlayer" controls autoplay playsinline></video>
+    </div>
+    <div class="error-message" id="errorMessage">
+       <div style="font-size: 30px; margin-bottom: 10px;">⚠️</div>
+       <div id="errorText">Канал недоступен</div>
+       <button onclick="location.reload()" style="margin-top:15px; padding:8px 15px; background:#444; color:white; border:none; border-radius:5px;">Обновить</button>
+    </div>
+  </div>
 
   <div class="sidebar">
     <div class="auth-buttons">
@@ -62,31 +84,25 @@
       <button onclick="loadCategory('uz')">UZ</button>
       <button onclick="loadCategory('sport')">Спорт</button>
     </div>
+    
     <input type="text" class="search" placeholder="Поиск каналов..." oninput="filterChannels(this.value)">
-    <ul class="channel-list" id="channelList"></ul>
-  </div>
-
-  <div class="player">
-    <div id="playerOverlay">🔐 Для просмотра нужно войти в аккаунт</div>
-    <video id="videoPlayer" controls autoplay playsinline></video>
-    <div class="error-message" id="errorMessage"></div>
+    
+    <div class="sidebar-content">
+      <ul class="channel-list" id="channelList"></ul>
+    </div>
   </div>
 
   <div id="loginModal" class="modal">
     <div class="modal-content">
       <span class="close" onclick="closeLoginModal()">&times;</span>
-      <h3 style="margin-top:0">Авторизация</h3>
-      
+      <h3>Авторизация</h3>
       <button class="auth-button btn-main" onclick="signInWithGoogle()">
         <img src="google.svg" width="18"> Google
       </button>
-
       <div class="divider">Скоро / Tez kunda</div>
-
       <button class="auth-button btn-social" onclick="alert('Facebook скоро...')">
         <img src="facebook.svg" width="18"> Facebook
       </button>
-
       <button class="auth-button btn-social" onclick="alert('Apple ID скоро...')">
         <img src="apple.svg" width="18" style="filter: invert(1);"> Apple
       </button>
@@ -124,8 +140,8 @@
         { name: " Sport FHD", url: "https://stream7.itv.uz/t/Udm5GBmb-RuEwUOUy-3tvQ/e/1767960060/1004/tracks-v1a1/mono.m3u8" }
       ],
       sport: [
-        { name: "⚽ Setanta 1", url: "https://iptv-proxy-m2sm.onrender.com/channel/setanta1/index.m3u8" },
-        { name: "⚽ Setanta 2", url: "https://vod.splay.uz/live_splay/original/Setanta2HD/tracks-v1a1/mono.m3u8" }
+        { name: " Setanta 1", url: "https://iptv-proxy-m2sm.onrender.com/channel/setanta1/index.m3u8" },
+        { name: " Setanta 2", url: "https://vod.splay.uz/live_splay/original/Setanta2HD/tracks-v1a1/mono.m3u8" }
       ]
     };
 
@@ -134,16 +150,12 @@
 
     function loadCategory(category) {
       allChannels = manualChannels[category] ? [...manualChannels[category]] : [];
-      fetch(playlists[category])
-        .then(r => r.text())
-        .then(text => {
-          allChannels.push(...parseM3U(text));
-          filteredChannels = [...allChannels];
-          renderChannels(filteredChannels);
-        }).catch(() => {
-          filteredChannels = [...allChannels];
-          renderChannels(filteredChannels);
-        });
+      renderChannels(allChannels);
+      fetch(playlists[category]).then(r => r.text()).then(text => {
+        allChannels = [...allChannels, ...parseM3U(text)];
+        filteredChannels = [...allChannels];
+        renderChannels(filteredChannels);
+      }).catch(() => renderChannels(allChannels));
     }
 
     function parseM3U(text) {
@@ -179,16 +191,19 @@
 
     function playChannel(url, name) {
       const video = document.getElementById('videoPlayer');
-      const errorMsg = document.getElementById('errorMessage');
-      errorMsg.textContent = '';
+      const errDiv = document.getElementById('errorMessage');
+      errDiv.style.display = "none";
       if (hls) hls.destroy();
+      video.pause(); video.src = ""; video.load();
       if (Hls.isSupported()) {
         hls = new Hls();
         hls.loadSource(url);
         hls.attachMedia(video);
-        hls.on(Hls.Events.ERROR, (e, data) => { if(data.fatal) errorMsg.textContent = `Ошибка: ${name} недоступен.`; });
+        hls.on(Hls.Events.MANIFEST_PARSED, () => video.play());
+        hls.on(Hls.Events.ERROR, (e, d) => { if(d.fatal) { errDiv.style.display="flex"; document.getElementById('errorText').textContent=`${name} недоступен`; } });
       } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
         video.src = url;
+        video.onerror = () => { errDiv.style.display="flex"; };
       }
     }
 
@@ -201,7 +216,6 @@
       const provider = new firebase.auth.GoogleAuthProvider();
       auth.signInWithPopup(provider).then(() => closeLoginModal());
     }
-
     function signOut() { auth.signOut(); }
 
     auth.onAuthStateChanged(user => {

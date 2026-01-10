@@ -221,10 +221,99 @@
     function renderChannels(channels) {
       const list = document.getElementById('channelList');
       list.innerHTML = '';
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyCpC7UxSbtGq3fZ7k4v4yCVDguFu4MU_nI",
+      authDomain: "iptv-8b8f9.firebaseapp.com",
+      projectId: "iptv-8b8f9",
+      storageBucket: "iptv-8b8f9.firebasestorage.app",
+      messagingSenderId: "697245556188",
+      appId: "1:697245556188:web:a4c8881c17eac1d76b4319"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    let hls, activeChannel, allChannels = [], filteredChannels = [];
+
+    const playlists = {
+      ru: "https://raw.githubusercontent.com/Isfandiyor0112-star/m3u8/refs/heads/main/ru.m3u",
+      uz: "https://raw.githubusercontent.com/Isfandiyor0112-star/m3u8/refs/heads/main/uz.m3u",
+      sport: "https://raw.githubusercontent.com/Isfandiyor0112-star/m3u8/refs/heads/main/sport_https_only.m3u"
+    };
+
+    const manualChannels = {
+      uz: [
+        { name: "Aqlvoy", url: "https://stream9.itv.uz/t/eU1j81pDbrG3SiLCEI9qhA/e/1764421857/1205/tracks-v1a1/mono.m3u8" },
+        { name: "Futbol TV", url: "https://iptv-proxy-m2sm.onrender.com/channel/futboltvuz/index.m3u8" },
+        { name: "Sport FHD", url: "https://iptv-proxy-m2sm.onrender.com/channel/sportuztv/index.m3u8" }
+      ],
+      sport: [
+        { name: "Setanta 1", url: "https://iptv-proxy-m2sm.onrender.com/channel/setanta1/index.m3u8" },
+        { name: "Setanta 2", url: "https://vod.splay.uz/live_splay/original/Setanta2HD/tracks-v1a1/mono.m3u8" }
+      ]
+    };
+
+    function openLoginModal() { document.getElementById("loginModal").style.display = "flex"; }
+    function closeLoginModal() { document.getElementById("loginModal").style.display = "none"; }
+
+    function loadCategory(category) {
+      const list = document.getElementById('channelList');
+      list.innerHTML = '<li style="justify-content:center; padding:20px;">Загрузка...</li>';
+      
+      let local = manualChannels[category] ? [...manualChannels[category]] : [];
+      
+      fetch(playlists[category] + '?t=' + Date.now())
+        .then(r => r.text())
+        .then(text => {
+          const remote = parseM3U(text);
+          let combined = [...local, ...remote];
+          
+          const uniqueMap = new Map();
+          combined.forEach(ch => {
+            const cleanName = ch.name.trim();
+            if(!uniqueMap.has(ch.url)) uniqueMap.set(ch.url, { name: cleanName, url: ch.url });
+          });
+
+          // Сортировка: теперь "Aqlvoy" будет первым, а "Zo'r TV" на своем месте
+          allChannels = Array.from(uniqueMap.values()).sort((a, b) => 
+            a.name.localeCompare(b.name, 'ru', { sensitivity: 'base' })
+          );
+
+          filteredChannels = [...allChannels];
+          renderChannels(filteredChannels);
+        })
+        .catch(() => {
+          allChannels = local;
+          renderChannels(allChannels);
+        });
+    }
+
+    function parseM3U(text) {
+      const lines = text.split('\n');
+      const channels = [];
+      let currentName = '';
+      for (let line of lines) {
+        line = line.trim();
+        if (line.startsWith('#EXTINF:')) {
+          currentName = line.split(',').pop().trim();
+        } else if (line.startsWith('http')) {
+          if (currentName) {
+            channels.push({ name: currentName, url: line });
+            currentName = '';
+          }
+        }
+      }
+      return channels;
+    }
+
+    function renderChannels(channels) {
+      const list = document.getElementById('channelList');
+      list.innerHTML = '';
       const isAuth = !!auth.currentUser;
       channels.forEach(ch => {
         const li = document.createElement('li');
         li.className = ch.url === activeChannel ? 'active' : '';
+        // Если это Zo'r TV, он теперь точно будет виден
         li.innerHTML = `<span>${ch.name}</span> <span>${!isAuth ? '🔐' : ''}</span>`;
         li.onclick = () => {
           if (!isAuth) { openLoginModal(); return; }
@@ -242,21 +331,29 @@
       const errDiv = document.getElementById('errorMessage');
       errDiv.style.display = "none";
       if (hls) hls.destroy();
-      video.pause(); video.src = ""; video.load();
+      
       if (Hls.isSupported()) {
-        hls = new Hls();
+        hls = new Hls({
+            enableWorker: true,
+            lowLatencyMode: true,
+            backBufferLength: 60
+        });
         hls.loadSource(url);
         hls.attachMedia(video);
         hls.on(Hls.Events.MANIFEST_PARSED, () => video.play());
-        hls.on(Hls.Events.ERROR, (e, d) => { if(d.fatal) { errDiv.style.display="flex"; document.getElementById('errorText').textContent=`${name} недоступен`; } });
-      } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+        hls.on(Hls.Events.ERROR, (e, d) => { if(d.fatal) errDiv.style.display="flex"; });
+      } else {
         video.src = url;
-        video.onerror = () => { errDiv.style.display="flex"; };
+        video.play();
       }
     }
 
     function filterChannels(q) {
-      filteredChannels = allChannels.filter(c => c.name.toLowerCase().includes(q.toLowerCase()));
+      const query = q.toLowerCase();
+      // Поиск теперь игнорирует апострофы и спецсимволы
+      filteredChannels = allChannels.filter(c => 
+        c.name.toLowerCase().replace(/['`]/g, '').includes(query.replace(/['`]/g, ''))
+      );
       renderChannels(filteredChannels);
     }
 
@@ -275,7 +372,9 @@
 
     window.onload = () => loadCategory('uz');
   </script>
+
 </body>
 </html>
+
 
 

@@ -4,113 +4,65 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
-  <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#0078d7">
   <title>Isfandiyor's IPTV</title>
   <style>
-    /* ОБЩИЕ НАСТРОЙКИ */
     body { margin:0; display:flex; font-family:"Segoe UI", sans-serif; height:100vh; background:#1e1e1e; color:#f5f5f5; overflow: hidden; }
-    
-    /* АДАПТИВНОСТЬ: МОБИЛЬНАЯ ВЕРСИЯ */
     @media (max-width: 768px) {
       body { flex-direction: column; }
-      .player { width: 100%; height: 56.25vw !important; flex-shrink: 0; position: sticky; top: 0; z-index: 100; order: 1; background: #000; }
-      .sidebar { width: 100% !important; flex-grow: 1; border-right: none !important; height: calc(100vh - 56.25vw); order: 2; display: flex; flex-direction: column; overflow: hidden; position: relative; }
+      .p-v { width: 100%; height: 56.25vw !important; flex-shrink: 0; position: sticky; top: 0; z-index: 100; background: #000; }
+      .s-b { width: 100% !important; flex-grow: 1; height: calc(100vh - 56.25vw); display: flex; flex-direction: column; overflow: hidden; }
     }
-
-    /* ПК ВЕРСИЯ */
     @media (min-width: 769px) {
-      .sidebar { width: 320px; height: 100vh; border-right: 1px solid #444; display: flex; flex-direction: column; flex-shrink: 0; order: 1; position: relative; }
-      .player { flex: 1; height: 100vh; position: relative; background: #000; display: flex; flex-direction: column; order: 2; overflow: hidden; }
+      .s-b { width: 320px; height: 100vh; border-right: 1px solid #444; display: flex; flex-direction: column; flex-shrink: 0; }
+      .p-v { flex: 1; height: 100vh; background: #000; display: flex; flex-direction: column; overflow: hidden; }
     }
-
-    .sidebar { background:#2a2a2a; box-sizing: border-box; display: flex; flex-direction: column; }
-    
-    /* ФИКСИРОВАННАЯ ВЕРХНЯЯ ЧАСТЬ САЙДБАРА */
-    .sidebar-header { padding: 15px 15px 5px 15px; background: #2a2a2a; z-index: 10; }
-
-    .video-container { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: #000; position: relative; }
-    video { width: 100%; height: 100%; max-height: 100vh; object-fit: contain; background:black; z-index: 1; }
-    
-    /* Прокрутка списка */
-    .sidebar-content { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; touch-action: pan-y; padding: 0 15px 15px 15px; }
-    
-    .categories { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:10px; }
-    .categories button { flex:1; background:#3a3a3a; border:none; color:#f5f5f5; padding:10px; border-radius:6px; cursor:pointer; font-weight: bold; font-size: 13px; }
-    .categories button:hover { background:#0078d7; }
-    
-    .search { width:100%; padding:12px; border:none; border-radius:6px; outline:none; background:#3a3a3a; color:#f5f5f5; box-sizing: border-box; margin-bottom: 10px; }
-    
-    .channel-list { list-style:none; padding:0; margin:0; }
-    .channel-list li { cursor:pointer; padding:12px; border-bottom:1px solid #333; display:flex; justify-content:space-between; align-items:center; transition: 0.2s; font-size: 14px; }
-    .channel-list li.active { background:#0078d7; font-weight:bold; }
-
-    /* КНОПКИ АВТОРИЗАЦИИ */
-    .auth-button { width: 100%; padding: 14px; border: none; border-radius: 12px; cursor: pointer; margin-bottom: 10px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 15px; transition: 0.2s; }
-    .btn-main { background: #0078d7; color: white; }
-    .btn-social { background: #333; color: white; border: 1px solid #444; }
-
-    /* МОДАЛЬНОЕ ОКНО */
-    .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); justify-content: center; align-items: center; }
-    .modal-content { background: #222; padding: 30px; border-radius: 20px; width: 90%; max-width: 320px; color: #fff; text-align: center; border: 1px solid #444; position: relative; }
-    .close { position: absolute; right: 20px; top: 15px; font-size: 24px; cursor: pointer; color: #888; }
-
-    .divider { display: flex; align-items: center; margin: 20px 0; color: #666; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; }
-    .divider::before, .divider::after { content: ""; flex: 1; border-bottom: 1px solid #444; margin: 0 10px; }
-
-    #playerOverlay { position:absolute; top:0; left:0; right:0; bottom:0; display:flex; justify-content:center; align-items:center; background:rgba(0,0,0,0.85); color:#fff; z-index:10; text-align:center; padding:20px; font-size:18px; }
-    .error-message { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); color: #ff4d4d; display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 999; text-align: center; padding: 20px; box-sizing: border-box; }
+    .s-b { background:#2a2a2a; box-sizing: border-box; }
+    .s-h { padding: 15px; background: #2a2a2a; }
+    .v-c { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: #000; position: relative; }
+    video { width: 100%; height: 100%; object-fit: contain; }
+    .s-c { flex: 1; overflow-y: auto; padding: 0 15px 15px 15px; }
+    .cats { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:10px; }
+    .cats button { flex:1; background:#3a3a3a; border:none; color:#f5f5f5; padding:10px; border-radius:6px; cursor:pointer; font-weight: bold; }
+    .srch { width:100%; padding:12px; border:none; border-radius:6px; background:#3a3a3a; color:#f5f5f5; box-sizing: border-box; margin-bottom: 10px; }
+    .c-l { list-style:none; padding:0; margin:0; }
+    .c-l li { cursor:pointer; padding:12px; border-bottom:1px solid #333; display:flex; justify-content:space-between; transition: 0.2s; }
+    .c-l li.active { background:#0078d7; font-weight:bold; }
+    .a-b { width: 100%; padding: 14px; border: none; border-radius: 12px; cursor: pointer; margin-bottom: 10px; font-weight: 600; background: #0078d7; color: white; display: flex; align-items: center; justify-content: center; }
+    .m-d { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); justify-content: center; align-items: center; }
+    .m-c { background: #222; padding: 30px; border-radius: 20px; width: 90%; max-width: 320px; text-align: center; position: relative; border: 1px solid #444; }
+    #o-v { position:absolute; top:0; left:0; right:0; bottom:0; display:flex; justify-content:center; align-items:center; background:rgba(0,0,0,0.9); color:#fff; z-index:10; text-align:center; padding:20px; }
   </style>
 </head>
 <body>
 
-  <div class="player">
-    <div id="playerOverlay">🔐 Для просмотра нужно войти в аккаунт</div>
-    <div class="video-container">
-      <video id="videoPlayer" controls autoplay playsinline></video>
-    </div>
-    <div class="error-message" id="errorMessage">
-       <div style="font-size: 30px; margin-bottom: 10px;">⚠️</div>
-       <div id="errorText">Канал недоступен</div>
-       <button onclick="location.reload()" style="margin-top:15px; padding:8px 15px; background:#444; color:white; border:none; border-radius:5px;">Обновить</button>
+  <div class="p-v">
+    <div id="o-v">🔐 Войдите для просмотра</div>
+    <div class="v-c">
+      <video id="v-p" controls autoplay playsinline></video>
     </div>
   </div>
 
-  <div class="sidebar">
-    <div class="sidebar-header">
-      <div class="auth-buttons">
-        <button id="loginBtn" class="auth-button btn-main" onclick="openLoginModal()">Войти в аккаунт</button>
-        <button id="logoutBtn" class="auth-button btn-social" onclick="signOut()" style="display:none;">Выйти</button>
+  <div class="s-b">
+    <div class="s-h">
+      <button id="l-i" class="a-b" onclick="_0xOpen()">Войти</button>
+      <button id="l-o" class="a-b" onclick="signOut()" style="display:none; background:#444;">Выйти</button>
+      <div class="cats">
+        <button onclick="_0xLoad('uz')">UZ</button>
+        <button onclick="_0xLoad('ru')">RU</button>
+        <button onclick="_0xLoad('sport')">Спорт</button>
       </div>
-
-      <div class="categories">
-        <button onclick="loadCategory('ru')">RU</button>
-        <button onclick="loadCategory('uz')">UZ</button>
-        <button onclick="loadCategory('sport')">Спорт</button>
-      </div>
-      
-      <input type="text" class="search" placeholder="Поиск каналов..." oninput="filterChannels(this.value)">
+      <input type="text" class="srch" placeholder="Поиск..." oninput="_0xFilter(this.value)">
     </div>
-    
-    <div class="sidebar-content">
-      <ul class="channel-list" id="channelList"></ul>
+    <div class="s-c">
+      <ul class="c-l" id="c-list"></ul>
     </div>
   </div>
 
-  <div id="loginModal" class="modal">
-    <div class="modal-content">
-      <span class="close" onclick="closeLoginModal()">&times;</span>
+  <div id="l-m" class="m-d">
+    <div class="m-c">
+      <span onclick="_0xClose()" style="position:absolute; right:20px; top:10px; cursor:pointer; font-size:24px;">&times;</span>
       <h3>Авторизация</h3>
-      <button class="auth-button btn-main" onclick="signInWithGoogle()">
-        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="18"> Google
-      </button>
-      <div class="divider">Скоро / Tez kunda</div>
-      <button class="auth-button btn-social" onclick="alert('Facebook скоро...')">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/0/05/Facebook_Logo_%282019%29.png" width="18"> Facebook
-      </button>
-      <button class="auth-button btn-social" onclick="alert('Apple ID скоро...')">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg" width="18" style="filter: invert(1);"> Apple
-      </button>
+      <button class="a-b" onclick="signInWithGoogle()">Google</button>
     </div>
   </div>
 
@@ -119,7 +71,16 @@
   <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 
   <script>
-    const firebaseConfig = {
+    // --- БЛОК ОБНОВЛЕНИЯ КАНАЛОВ (Base64) ---
+    const _0xList = {
+      "uz": [
+        { "n": "QXFsdm95", "u": "aHR0cHM6Ly9zdHJlYW05Lml0di51ei90L2VVMWp8MXBEYnJHM1NpTENFSTlxaEEvZS8xNzY0NDIxODU3LzEyMDUvdHJhY2tzLXYxYTEvbW9uby5tM3U4" },
+        { "n": "RnV0Ym9sIFRW", "u": "aHR0cHM6Ly9pcHR2LXByb3h5LW0yc20ub25yZW5kZXIuY29tL2NoYW5uZWwvZnV0Ym9sdHZ1ei9pbmRleC5tM3U4" },
+        { "n": "Wm8nciBUVg==", "u": "aHR0cHM6Ly9jZG4uaXR2LnV6L3QvdXp0L3pvcl90di9pbmRleC5tM3U4" }
+      ]
+    };
+
+    const _0xKey = {
       apiKey: "AIzaSyCpC7UxSbtGq3fZ7k4v4yCVDguFu4MU_nI",
       authDomain: "iptv-8b8f9.firebaseapp.com",
       projectId: "iptv-8b8f9",
@@ -128,160 +89,99 @@
       appId: "1:697245556188:web:a4c8881c17eac1d76b4319"
     };
 
-    firebase.initializeApp(firebaseConfig);
+    firebase.initializeApp(_0xKey);
     const auth = firebase.auth();
-    let hls, activeChannel, allChannels = [], filteredChannels = [];
+    let hls, _0xAct, _0xAll = [], _0xFilt = [];
 
-    const playlists = {
+    const _0xP = {
       ru: "https://raw.githubusercontent.com/Isfandiyor0112-star/m3u8/refs/heads/main/ru.m3u",
       uz: "https://raw.githubusercontent.com/Isfandiyor0112-star/m3u8/refs/heads/main/uz.m3u",
       sport: "https://raw.githubusercontent.com/Isfandiyor0112-star/m3u8/refs/heads/main/sport_https_only.m3u"
     };
 
-    const manualChannels = {
-      uz: [
-        { name: "Aqlvoy", url: "https://stream9.itv.uz/t/eU1j81pDbrG3SiLCEI9qhA/e/1764421857/1205/tracks-v1a1/mono.m3u8" },
-        { name: "Futbol TV", url: "https://iptv-proxy-m2sm.onrender.com/channel/futboltvuz/index.m3u8" },
-        { name: "Sport FHD", url: "https://iptv-proxy-m2sm.onrender.com/channel/sportuztv/index.m3u8" }
-      ],
-      sport: [
-        { name: " Setanta 1", url: "https://iptv-proxy-m2sm.onrender.com/channel/setanta1/index.m3u8" },
-        { name: " Setanta 2", url: "https://vod.splay.uz/live_splay/original/Setanta2HD/tracks-v1a1/mono.m3u8" }
-      ]
-    };
+    // Обфусцированные функции
+    const _0xDec = (e) => window.atob(e);
+    function _0xOpen() { document.getElementById("l-m").style.display = "flex"; }
+    function _0xClose() { document.getElementById("l-m").style.display = "none"; }
 
-    function openLoginModal() { document.getElementById("loginModal").style.display = "flex"; }
-    function closeLoginModal() { document.getElementById("loginModal").style.display = "none"; }
-
-        function loadCategory(category) {
-      const list = document.getElementById('channelList');
-      // Очищаем список и показываем статус загрузки
-      list.innerHTML = '<li style="justify-content:center;">Загрузка списка...</li>';
+    function _0xLoad(c) {
+      const l = document.getElementById('c-list');
+      l.innerHTML = '<li>...</li>';
+      let loc = (_0xList[c] || []).map(i => ({ n: _0xDec(i.n), u: i.u }));
       
-      // 1. Сначала берем ручные каналы (прокси)
-      let localChannels = manualChannels[category] ? [...manualChannels[category]] : [];
-      
-      // 2. Сразу записываем их в основной список, чтобы они не пропали
-      allChannels = localChannels;
-      filteredChannels = [...allChannels];
-      renderChannels(filteredChannels);
-
-      // 3. Загружаем дополнительные каналы из GitHub
-      fetch(playlists[category])
+      fetch(_0xP[c] + '?t=' + Date.now())
         .then(r => r.text())
-        .then(text => {
-          const remoteChannels = parseM3U(text);
-          
-          // 4. ОБЪЕДИНЯЕМ БЕЗ ПОТЕРЬ: твои прокси + каналы из M3U
-          allChannels = [...localChannels, ...remoteChannels];
-          
-          // Убираем дубликаты по URL (на всякий случай)
-          const uniqueChannels = [];
-          const map = new Map();
-          for (const item of allChannels) {
-              if(!map.has(item.url)){
-                  map.set(item.url, true);
-                  uniqueChannels.push(item);
-              }
-          }
-          
-          allChannels = uniqueChannels;
-          filteredChannels = [...allChannels];
-          
-          // 5. Перерисовываем полный список
-          renderChannels(filteredChannels);
-        })
-        .catch(err => {
-          console.error("Ошибка GitHub:", err);
-          // Если интернет-список упал, оставляем хотя бы ручные каналы
-          renderChannels(allChannels);
-        });
+        .then(t => {
+          const rem = _0xParse(t);
+          const m = new Map();
+          [...loc, ...rem].forEach(x => { if(!m.has(x.u)) m.set(x.u, x); });
+          _0xAll = Array.from(m.values()).sort((a,b) => a.n.localeCompare(b.n));
+          _0xFilt = [..._0xAll];
+          _0xRender(_0xFilt);
+        }).catch(() => _0xRender(loc));
     }
 
-    function parseM3U(text) {
-      const lines = text.split('\n');
-      const channels = [];
-      let currentName = '';
-      
-      for (let i = 0; i < lines.length; i++) {
-        let line = lines[i].trim();
-        if (line.startsWith('#EXTINF:')) {
-          // Вытаскиваем название канала после запятой
-          const parts = line.split(',');
-          currentName = parts[parts.length - 1].trim();
-        } else if (line && !line.startsWith('#')) {
-          // Это ссылка
-          if (currentName) {
-            channels.push({ name: currentName, url: line });
-            currentName = ''; // Сбрасываем для следующего
-          }
-        }
-      }
-      return channels;
+    function _0xParse(t) {
+      const lines = t.split('\n'), res = [];
+      let n = '';
+      lines.forEach(l => {
+        l = l.trim();
+        if(l.indexOf('#EXTINF:') > -1) n = l.split(',').pop();
+        else if(l.indexOf('http') === 0) { if(n) res.push({n, u: btoa(l)}); n = ''; }
+      });
+      return res;
     }
 
-
-    function renderChannels(channels) {
-      const list = document.getElementById('channelList');
-      list.innerHTML = '';
-      const isAuth = !!auth.currentUser;
-      channels.forEach(ch => {
+    function _0xRender(chs) {
+      const l = document.getElementById('c-list');
+      l.innerHTML = '';
+      const isA = !!auth.currentUser;
+      chs.forEach(i => {
         const li = document.createElement('li');
-        li.className = ch.url === activeChannel ? 'active' : '';
-        li.innerHTML = `<span>${ch.name}</span> <span>${!isAuth ? '🔐' : ''}</span>`;
+        li.className = i.u === _0xAct ? 'active' : '';
+        li.innerHTML = `<span>${i.n}</span><span>${!isA ? '🔐' : ''}</span>`;
         li.onclick = () => {
-          if (!isAuth) { openLoginModal(); return; }
-          document.getElementById("playerOverlay").style.display = "none";
-          activeChannel = ch.url;
-          playChannel(ch.url, ch.name);
-          renderChannels(channels);
+          if(!isA) return _0xOpen();
+          document.getElementById("o-v").style.display = "none";
+          _0xAct = i.u;
+          _0xPlay(i.u);
+          _0xRender(chs);
         };
-        list.appendChild(li);
+        l.appendChild(li);
       });
     }
 
-    function playChannel(url, name) {
-      const video = document.getElementById('videoPlayer');
-      const errDiv = document.getElementById('errorMessage');
-      errDiv.style.display = "none";
-      if (hls) hls.destroy();
-      video.pause(); video.src = ""; video.load();
-      if (Hls.isSupported()) {
+    function _0xPlay(u) {
+      const v = document.getElementById('v-p');
+      const d = _0xDec(u);
+      if(hls) hls.destroy();
+      if(Hls.isSupported()) {
         hls = new Hls();
-        hls.loadSource(url);
-        hls.attachMedia(video);
-        hls.on(Hls.Events.MANIFEST_PARSED, () => video.play());
-        hls.on(Hls.Events.ERROR, (e, d) => { if(d.fatal) { errDiv.style.display="flex"; document.getElementById('errorText').textContent=`${name} недоступен`; } });
-      } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-        video.src = url;
-        video.onerror = () => { errDiv.style.display="flex"; };
-      }
+        hls.loadSource(d);
+        hls.attachMedia(v);
+        hls.on(Hls.Events.MANIFEST_PARSED, () => v.play());
+      } else { v.src = d; v.play(); }
     }
 
-    function filterChannels(q) {
-      filteredChannels = allChannels.filter(c => c.name.toLowerCase().includes(q.toLowerCase()));
-      renderChannels(filteredChannels);
+    function _0xFilter(q) {
+      const f = q.toLowerCase();
+      _0xFilt = _0xAll.filter(i => i.n.toLowerCase().includes(f));
+      _0xRender(_0xFilt);
     }
 
     function signInWithGoogle() {
-      const provider = new firebase.auth.GoogleAuthProvider();
-      auth.signInWithPopup(provider).then(() => closeLoginModal());
+      auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()).then(() => _0xClose());
     }
     function signOut() { auth.signOut(); }
 
-    auth.onAuthStateChanged(user => {
-      document.getElementById("loginBtn").textContent = user ? (user.displayName || "Профиль") : "Войти в аккаунт";
-      document.getElementById("logoutBtn").style.display = user ? "flex" : "none";
-      document.getElementById("playerOverlay").style.display = user ? "none" : "flex";
-      renderChannels(filteredChannels);
+    auth.onAuthStateChanged(u => {
+      document.getElementById("l-i").textContent = u ? (u.displayName || "Профиль") : "Войти";
+      document.getElementById("l-o").style.display = u ? "block" : "none";
+      document.getElementById("o-v").style.display = u ? "none" : "flex";
+      _0xRender(_0xFilt);
     });
 
-    window.onload = () => loadCategory('uz');
+    window.onload = () => _0xLoad('uz');
   </script>
 </body>
 </html>
-
-
-
-
-

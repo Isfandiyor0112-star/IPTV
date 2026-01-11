@@ -30,13 +30,36 @@
     </div>
   </div>
 
-  <div id="l-m" class="m-d">
-    <div class="m-c">
-      <span onclick="_0xClose()" style="position:absolute; right:20px; top:10px; cursor:pointer; font-size:24px;">&times;</span>
-      <h3>Авторизация</h3>
-      <button class="a-b" onclick="signInWithGoogle()">Google</button>
+ <div id="l-m" class="m-d">
+  <div class="m-c">
+    <span class="close-btn" onclick="_0xClose()">&times;</span>
+    <h3>Вход в систему</h3>
+    
+    <div class="auth-list">
+      <button class="a-b btn-google" onclick="signInWithGoogle()">
+        <img src="google.svg" width="20">
+        Google
+      </button>
+
+      <button class="a-b btn-fb btn-soon">
+        <img src="facebook.svg" width="20">
+        Facebook
+        <span class="soon-badge">СКОРО</span>
+      </button>
+
+      <button class="a-b btn-apple btn-soon">
+        <img src="apple.svg" width="20" style="filter: invert(1);">
+        Apple ID
+        <span class="soon-badge">СКОРО</span>
+      </button>
     </div>
+
+    <p style="color: #555; font-size: 11px; margin-top: 20px;">
+      Доступ к Full HD каналам только для авторизованных пользователей.
+    </p>
   </div>
+</div>
+
 
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
@@ -164,6 +187,7 @@
   </script>
 </body>
 </html>
+
 
 
 

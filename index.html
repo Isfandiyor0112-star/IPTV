@@ -67,21 +67,18 @@
 
   <script>
 
-       const _0xList = {
+         // --- ОБНОВЛЕННЫЙ БЛОК С КАНАЛАМИ (Base64) - ТЕПЕРЬ НА VERCEL ---
+    const _0xList = {
       "uz": [
         { "n": "QXFsdm95", "u": "aHR0cHM6Ly9zdHJlYW05Lml0di51ei90L2VVMWp8MXBEYnJHM1NpTENFSTlxaEEvZS8xNzY0NDIxODU3LzEyMDUvdHJhY2tzLXYxYTEvbW9uby5tM3U4" },
-        // Прямая ссылка на Futbol TV
-        { "n": "RnV0Ym9sIFRW", "u": "aHR0cHM6Ly9zdC51emxpdmUucnUvZnV0Ym9sdHZ1ei9pbmRleC5tM3U4" },
-        // Прямая ссылка на Sport FHD
-        { "n": "U3BvcnQgRkhE", "u": "aHR0cHM6Ly9zdC51emxpdmUucnUvc3BvcnR1enR2L2luZGV4Lm0zdTg=" }
+        { "n": "RnV0Ym9sIFRW", "u": "aHR0cHM6Ly9pcHR2LXByb3h5LWd1bGVzLnZlcmNlbC5hcHAvY2hhbm5lbC9mdXRib2x0dnV6L2luZGV4Lm0zdTg=" },
+        { "n": "U3BvcnQgRkhE", "u": "aHR0cHM6Ly9pcHR2LXByb3h5LWd1bGVzLnZlcmNlbC5hcHAvY2hhbm5lbC9zcG9ydHV6dHYvaW5kZXgubTN1OA==" }
       ],
       "sport": [
-        // Прямая ссылка на Setanta 1
-        { "n": "IFNldGFudGEgMQ==", "u": "aHR0cHM6Ly9zdC51emxpdmUucnUvc2V0YW50YS0xL2luZGV4Lm0zdTg=" },
+        { "n": "IFNldGFudGEgMQ==", "u": "aHR0cHM6Ly9pcHR2LXByb3h5LWd1bGVzLnZlcmNlbC5hcHAvY2hhbm5lbC9zZXRhbnRhMS9pbmRleC5tM3U4" },
         { "n": "IFNldGFudGEgMg==", "u": "aHR0cHM6Ly92b2Quc3BsYXkudXovbGl2ZV9zcGxheS9vcmlnaW5hbC9TZXRhbnRhMkhEL3RyYWNrcy12MWExL21vbm8ubTN1OA==" } 
       ]
     };
-
 
 
     const _0xKey = {
@@ -155,39 +152,18 @@
       });
     }
 
-       function _0xPlay(u) {
+    function _0xPlay(u) {
       const v = document.getElementById('v-p');
-      const d = _0xDec(u); // Декодируем прямую ссылку
-      
+      const d = _0xDec(u);
       if(hls) hls.destroy();
-
       if(Hls.isSupported()) {
-        hls = new Hls({
-          // Настройка перехвата запросов
-          xhrSetup: function (xhr, url) {
-            xhr.setRequestHeader("Referer", "https://futboll.tv/");
-            xhr.setRequestHeader("Origin", "https://futboll.tv");
-            // Добавляем sid, если он нужен для авторизации
-            xhr.setRequestHeader("x-sid", "6929952d-3f2d-4883-aea8-542c9ab2e638");
-          }
-        });
+        hls = new Hls();
         hls.loadSource(d);
         hls.attachMedia(v);
         hls.on(Hls.Events.MANIFEST_PARSED, () => v.play());
-        
-        // Обработка ошибок CORS
-        hls.on(Hls.Events.ERROR, function (event, data) {
-          if (data.details === 'manifestLoadError') {
-             console.error("Ошибка CORS: Сервер блокирует прямой доступ.");
-          }
-        });
-      } else { 
-        v.src = d; 
-        v.play(); 
-      }
+      } else { v.src = d; v.play(); }
     }
 
- 
     function _0xFilter(q) {
       const f = q.toLowerCase();
       _0xFilt = _0xAll.filter(i => i.n.toLowerCase().includes(f));
@@ -210,7 +186,6 @@
   </script>
 </body>
 </html>
-
 
 
 
